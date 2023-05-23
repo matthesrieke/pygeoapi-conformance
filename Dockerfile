@@ -104,6 +104,9 @@ ENV TZ=${TZ} \
 WORKDIR /pygeoapi
 ADD . /pygeoapi
 
+COPY pyGeoAPICFG.yml cfg.yml
+ENV PYGEOAPI_CONFIG=cfg.yml
+
 # Install operating system dependencies
 RUN \
     apt-get update -y \
@@ -136,6 +139,4 @@ RUN \
     && apt-get clean \
     && apt autoremove -y  \
     && rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT ["/entrypoint.sh"]
 
