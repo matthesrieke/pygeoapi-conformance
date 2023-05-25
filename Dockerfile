@@ -106,9 +106,6 @@ ADD . /pygeoapi
 
 RUN mkdir temp
 
-COPY pyGeoAPICFG.yml cfg.yml
-ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
-
 # Install operating system dependencies
 RUN \
     apt-get update -y \
@@ -142,5 +139,6 @@ RUN \
     && apt autoremove -y  \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
 RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
 ENV PYGEOAPI_OPENAPI=pygeoapi-openapi.yml
