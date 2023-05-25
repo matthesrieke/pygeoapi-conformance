@@ -20,14 +20,13 @@ server:
       attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia maps</a> | Map data &copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
 
   manager:  # optional OGC API - Processes asynchronous job management
-      name: MongoDB #TinyDB # plugin name (see pygeoapi.plugin for supported process_manager's)
-      connection: mongodb://localhost:27017 #C:/Daten/pygeoapi/tmp/pygeoapi-process-manager.db # connection info to store jobs (e.g. filepath)
-      output_dir: C:/Daten/pygeoapiCFG/tmp/  # temporary file area for storing job results (files)
-      plugin: mongodb_.MongoDBManager
+      name: TinyDB # plugin name (see pygeoapi.plugin for supported process_manager's)
+      connection: tmp/pygeoapi-process-manager.db # connection info to store jobs (e.g. filepath)
+      output_dir: tmp/  # temporary file area for storing job results (files)
   #ogc_schemas_location: C:/Daten/schemas/  # local copy of http://schemas.opengis.net
 logging:
     level: DEBUG  # the logging level (see https://docs.python.org/3/library/logging.html#logging-levels)
-    logfile: C:/Daten/pygeoapiCFG/tmp/pyGeoAPILOG.log  # the full file path to the logfile
+    #logfile: C:/Daten/pygeoapiCFG/tmp/pyGeoAPILOG.log  # the full file path to the logfile
 metadata:
     identification:
         title: pygeoapi 52°North Test Instance  # the title of the service
@@ -95,5 +94,4 @@ resources:
         type: process  # REQUIRED (collection, process, or stac-collection)
         processor:
             name: echo  # Python path of process defition
-            plugin: echo.echoProcessor
             

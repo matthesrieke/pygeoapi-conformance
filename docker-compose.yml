@@ -1,0 +1,12 @@
+services:
+  app:
+    image: lexal95/pygeoapiconformance
+    tty: true
+    command: pygeoapi serve
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - CONTAINER_PORT=5000
+
+      
