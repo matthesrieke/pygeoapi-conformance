@@ -3629,7 +3629,7 @@ class API:
         elif status == JobStatus.failed:
             msg = 'job failed'
             return self.get_exception(
-                HTTPStatus.BAD_REQUEST, headers, request.format,
+                HTTPStatus.NOT_FOUND, headers, request.format,
                 'InvalidParameterValue', msg)
 
         mimetype, job_output = self.manager.get_job_result(job_id)
@@ -4019,10 +4019,29 @@ class API:
         """
 
         LOGGER.error(description)
-        exception = {
-            'code': code,
-            'description': description
-        }
+        if code is 'NoSuchProcess':
+            exception = {
+                'code': code,
+                'description': description,
+                'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/no-such-process'
+            }
+        elif code is 'NoSuchJob':
+            exception = {
+                'code': code,
+                'description': description,
+                'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/no-such-job'
+            }
+        elif code is 'ResultNotReady':
+            exception = {
+                'code': code,
+                'description': description,
+                'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/result-not-ready'
+            }
+        else:
+            exception = {
+                'code': code,
+                'description': description,
+            }
 
         if format_ == F_HTML:
             headers['Content-Type'] = FORMAT_TYPES[F_HTML]
