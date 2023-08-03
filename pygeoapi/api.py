@@ -3440,18 +3440,19 @@ class API:
         for job_ in jobs:
             job2 = {
                 'processID': job_['process_id'],
+                'type': 'process',
                 'jobID': job_['identifier'],
                 'status': job_['status'],
                 'message': job_['message'],
                 'progress': job_['progress'],
-                'parameters': job_.get('parameters'),
+                #'parameters': job_.get('parameters'),
                 'job_start_datetime': job_['job_start_datetime'],
                 'job_end_datetime': job_['job_end_datetime']
             }
 
             # TODO: translate
             if JobStatus[job_['status']] in (
-               JobStatus.successful, JobStatus.running, JobStatus.accepted):
+               JobStatus.successful, JobStatus.running, JobStatus.accepted, JobStatus.failed):
 
                 job_result_url = f"{self.base_url}/jobs/{job_['identifier']}/results"  # noqa
 
@@ -3467,6 +3468,7 @@ class API:
                     'title': f'results of job {job_id} as JSON'
                 }]
 
+                '''     
                 if job_['mimetype'] not in (FORMAT_TYPES[F_JSON],
                                             FORMAT_TYPES[F_HTML]):
                     job2['links'].append({
@@ -3475,7 +3477,7 @@ class API:
                         'type': job_['mimetype'],
                         'title': f"results of job {job_id} as {job_['mimetype']}"  # noqa
                     })
-
+                '''
             serialized_jobs['jobs'].append(job2)
 
         if job_id is None:
@@ -3582,6 +3584,8 @@ class API:
 
         if status == JobStatus.accepted:
             http_status = HTTPStatus.CREATED
+        elif status == JobStatus.failed:
+            http_status = HTTPStatus.INTERNAL_SERVER_ERROR
         else:
             http_status = HTTPStatus.OK
 
@@ -3612,10 +3616,10 @@ class API:
         try:
             job = self.manager.get_job(job_id)
         except JobNotFoundError:
+            msg = 'no such job'
             return self.get_exception(
                 HTTPStatus.NOT_FOUND, headers,
-                request.format, 'NoSuchJob', job_id
-            )
+                request.format, 'NoSuchJob', msg)
 
         status = JobStatus[job['status']]
 

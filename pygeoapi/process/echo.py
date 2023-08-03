@@ -1,5 +1,4 @@
 import logging
-import math
 import time 
 from random import *
 from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
@@ -40,12 +39,7 @@ PROCESS_METADATA = {
   "outputs": {
     "echoOutput": {
       "schema": {
-        "type": "string",
-        "enum": [
-          "Value1",
-          "Value2",
-          "Value3"
-        ]
+        "type": "string"
       }
     }
   },
@@ -86,11 +80,13 @@ class echoProcessor(BaseProcessor):
 
         if echo is None:
             raise ProcessorExecuteError('Cannot process without echo value')
+        if not isinstance(echo, str):
+            raise ProcessorExecuteError('Cannot process with echo not of type String')
 
         outputs = {
             'echoOutput': echo
         }
-
+        time.sleep(10)
         return mimetype, outputs
 
     def __repr__(self):

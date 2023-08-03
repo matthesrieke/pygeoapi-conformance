@@ -290,7 +290,8 @@ class BaseManager:
             code = 'InvalidParameterValue'
             outputs = {
                 'code': code,
-                'description': 'Error updating job'
+                'description': 'Error updating job',
+                'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/job-failed'
             }
             LOGGER.error(err)
             job_metadata = {
