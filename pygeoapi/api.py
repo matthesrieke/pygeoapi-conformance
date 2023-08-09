@@ -4043,19 +4043,19 @@ class API:
         """
 
         LOGGER.error(description)
-        if code is 'NoSuchProcess':
+        if code == 'NoSuchProcess':
             exception = {
                 'code': code,
                 'description': description,
                 'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/no-such-process'
             }
-        elif code is 'NoSuchJob':
+        elif code == 'NoSuchJob':
             exception = {
                 'code': code,
                 'description': description,
                 'type': 'http://www.opengis.net/def/exceptions/ogcapi-processes-1/1.0/no-such-job'
             }
-        elif code is 'ResultNotReady':
+        elif code == 'ResultNotReady':
             exception = {
                 'code': code,
                 'description': description,

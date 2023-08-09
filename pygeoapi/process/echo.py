@@ -4,7 +4,7 @@ from random import *
 from pygeoapi.process.base import BaseProcessor, ProcessorExecuteError
 
 #execute command
-#curl -X POST "http://localhost:5000/processes/echo/execution" -H "Content-Type: application/json" -d "{\"mode\": \"async\", \"inputs\":{\"echo\": \"42\"}}"
+#curl -X POST "http://<host>:<port>/processes/echo/execution" -H "Content-Type: application/json" -d "{\"mode\": \"async\", \"inputs\":{\"echoInput\": \"42\", \"pause\": 10.0"}}"
 
 LOGGER = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 PROCESS_METADATA = {
   "id": "echo",
   "title": "Echo Process",
-  "description": "This process accepts and number of input and simple echoes each input as an output.",
+  "description": "This process accepts a string input value and echoes it back as a result. The processing time of the process may be controlled using the pause parameter.",
   "version": "1.0.0",
   "jobControlOptions": [
     "async-execute",
@@ -24,14 +24,29 @@ PROCESS_METADATA = {
   ],
   "inputs": {
     "echoInput": {
-      "title": "String Literal Input Example",
-      "description": "This is an example of a STRING literal input.",
+      "title": "Echo value",
+      "description": "This is an example of a String literal input.",
+      "minOccurs": 1,
+      "maxOccurs": 1,
       "schema": {
         "type": "string",
         "enum": [
           "Value1",
           "Value2",
           "Value3"
+        ]
+      }},
+    "pause": {
+      "title": "Pause value",
+      "description": "This parameter may be used to control the processing time of the echo process.",
+      "minOccurs": 1,
+      "maxOccurs": 1,
+      "schema": {
+        "type": "float",
+        "enum": [
+          5.5,
+          10.25,
+          42.0
         ]
       }
     }
@@ -53,7 +68,8 @@ PROCESS_METADATA = {
   ],
     'example': {
         'inputs': {
-            'echo': 'echoValue'
+            'echo': 'echoValue',
+            'pause': 10.0
         }
     }
 }
@@ -67,7 +83,7 @@ class echoProcessor(BaseProcessor):
 
         :param processor_def: provider definition
 
-        :returns: pygeoapi.process.test.TestProcessor
+        :returns: pygeoapi.process.echo.echoProcessor
         """
 
         super().__init__(processor_def, PROCESS_METADATA)
@@ -77,16 +93,20 @@ class echoProcessor(BaseProcessor):
         mimetype = 'application/json'
 
         echo = data.get('echoInput', None)
+        pause = data.get('pause', None)
 
         if echo is None:
-            raise ProcessorExecuteError('Cannot process without echo value')
+            raise ProcessorExecuteError('Cannot run process without echo value')
         if not isinstance(echo, str):
-            raise ProcessorExecuteError('Cannot process with echo not of type String')
+            raise ProcessorExecuteError('Cannot run process with echo not of type String')
 
         outputs = {
             'echoOutput': echo
         }
-        time.sleep(10)
+        if pause is not None:
+          if isinstance(pause, float):
+            time.sleep(pause)
+
         return mimetype, outputs
 
     def __repr__(self):
