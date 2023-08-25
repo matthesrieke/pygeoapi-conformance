@@ -138,6 +138,7 @@ RUN \
     && rm -rf /var/lib/apt/lists/*
 
 COPY portolan.geojson /pygeoapi/tests/data/portolan.geojson 
+COPY pygeoapi-config.yml pygeoapi-config.yml
 
 ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
 RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
