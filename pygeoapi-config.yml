@@ -61,7 +61,7 @@ logging:
 metadata:
     identification:
         title:
-            en: pygeoapi - 52° North test instance
+            en: pygeoapi - 52° North NextGen SDI Hack Instance
             fr: instance par défaut de pygeoapi
         description:
             en: pygeoapi provides an API to geospatial data

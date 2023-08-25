@@ -1,6 +1,6 @@
 services:
   app:
-    image: lexal95/pygeoapiconformance
+    image: pygeoapi-nextgensdi
     tty: true
     command: pygeoapi serve
     build: .

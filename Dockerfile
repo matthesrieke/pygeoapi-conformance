@@ -137,6 +137,11 @@ RUN \
     && apt autoremove -y  \
     && rm -rf /var/lib/apt/lists/*
 
+COPY portolan.geojson /pygeoapi/tests/data/portolan.geojson 
+
 ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
 RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
 ENV PYGEOAPI_OPENAPI=pygeoapi-openapi.yml
+
+#docker build -t pygeoapi-nextgensdi .    
+#docker-compose up
