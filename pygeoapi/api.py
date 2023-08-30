@@ -92,6 +92,10 @@ from pygeoapi.util import (dategetter, RequestedProcessExecutionMode,
 
 from pygeoapi.models.provider.base import TilesMetadataFormat
 
+from pygeoapi.dataset_management.postgres_manager import PostgresResourceManager
+from pygeoapi.dataset_management.crud_resource_registry import CrudResourceRegistryInterface
+
+
 LOGGER = logging.getLogger(__name__)
 
 #: Return headers for requests (e.g:X-Powered-By)
@@ -638,7 +642,7 @@ class APIRequest:
         return headers_
 
 
-class API:
+class API(CrudResourceRegistryInterface):
     """API object"""
 
     def __init__(self, config):
@@ -680,6 +684,9 @@ class API:
 
         self.manager = get_manager(self.config)
         LOGGER.info('Process manager plugin loaded')
+        
+        self.resource_manager = PostgresResourceManager(self)
+        LOGGER.info(f'ResourceManager loaded: {self.resource_manager}')
 
     @gzip
     @pre_process
@@ -4188,6 +4195,39 @@ class API:
                 content_crs_uri = DEFAULT_CRS
 
         headers['Content-Crs'] = f'<{content_crs_uri}>'
+        
+
+    def get_resource_config(self, resource_name):
+        """
+        Returns the configuration of a given resource
+        """
+        
+        if resource_name in self.config['resources']:
+            return self.config['resources'][resource_name]
+        else:
+            return None
+        
+    def set_resource_config(self, resource_name, config, force_update=False):
+        """
+        Sets or updates the configuration of a given resource.
+        This allows the runtime addition and update of resources
+        """
+        
+        if resource_name in self.config['resources'] and not force_update:
+            raise Exception(f"Resource '{resource_name}' already configured")
+        
+        self.config['resources'][resource_name] = config
+        
+    def delete_resource_config(self, resource_name):
+        """
+        Deletes the configuration of a given resource.
+        Will remove the resorce from the runtime configuration but not
+        persist (-> restart will re-enable the resource from the config yaml)
+        """
+        
+        if resource_name in self.config['resources']:
+            del self.config['resources'][resource_name]
+        
 
 
 def validate_bbox(value=None) -> list:
