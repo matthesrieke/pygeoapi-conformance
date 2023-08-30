@@ -81,6 +81,9 @@ class MapScriptProvider(BaseProvider):
                 LOGGER.debug('Setting OGR driver')
                 self._layer.setConnectionType(mapscript.MS_OGR, 'OGR')
                 self._layer.connection = self.data
+                
+                # use the "layer" option to define the target table/relation/featureset in the OGR driver
+                self._layer.data = self.options["layer"]
 
             self._layer.type = getattr(mapscript, self.options['type'])
 
