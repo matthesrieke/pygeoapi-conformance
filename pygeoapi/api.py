@@ -93,7 +93,7 @@ from pygeoapi.util import (dategetter, RequestedProcessExecutionMode,
 from pygeoapi.models.provider.base import TilesMetadataFormat
 
 from pygeoapi.dataset_management.postgres_manager import PostgresResourceManager
-from pygeoapi.dataset_management.crud_resource_registry import CrudResourceRegistryInterface
+from pygeoapi.dataset_management.crud_resource_registry import CrudResourceRegistry
 
 
 LOGGER = logging.getLogger(__name__)
@@ -642,7 +642,7 @@ class APIRequest:
         return headers_
 
 
-class API(CrudResourceRegistryInterface):
+class API(CrudResourceRegistry):
     """API object"""
 
     def __init__(self, config):

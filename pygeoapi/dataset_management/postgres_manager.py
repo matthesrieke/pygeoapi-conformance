@@ -1,7 +1,8 @@
-from .resource_manager import ResourceManager
-from .crud_resource_registry import CrudResourceRegistryInterface
 import threading
 import logging
+
+from .resource_manager import ResourceManager
+from .crud_resource_registry import CrudResourceRegistry
 
 class PostgresResourceManager(ResourceManager):
     
@@ -61,18 +62,25 @@ class PostgresResourceManager(ResourceManager):
       ]
     }
     
-    def __init__(self, api_object: CrudResourceRegistryInterface):
+    def __init__(self, resource_registry: CrudResourceRegistry):
+        self.resource_registry = resource_registry
 
-        t = threading.Thread(target=self.ingest_vector_data, args=('countries2', '/tmp/data', self.DUMMY_CONFIG, api_object))
+        t = threading.Thread(target=self.ingest_vector_data,
+                             args=('countries2', '/tmp/data',
+                             self.DUMMY_CONFIG))
         t.start()
     
-    def ingest_vector_data(self, collection_name, data_dir, configuration, global_resource_registry: CrudResourceRegistryInterface):
-        if global_resource_registry.get_resource_config(collection_name) != None:
-            raise Exception(f"Collection with name '{collection_name}' already present")
+    def ingest_vector_data(self, collection_name, data_dir, configuration,):
+        if self.resource_registry.get_resource_config(collection_name) \
+          is not None:
+            raise Exception(
+              f"Collection with name '{collection_name}' already present")
         
         self.load_and_store_data(data_dir, configuration)
-        global_resource_registry.set_resource_config(collection_name, configuration)
-        logging.info(f"resource '{collection_name}' registered with configuration: {configuration}")
+        self.resource_registry.set_resource_config(collection_name,
+                                                   configuration)
+        logging.info(f"resource '{collection_name}' \
+                     registered with configuration: {configuration}")
                
     def load_and_store_data(self, data_dir, configuration):
         pass

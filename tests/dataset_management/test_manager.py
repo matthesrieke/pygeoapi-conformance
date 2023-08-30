@@ -1,7 +1,8 @@
-from pygeoapi.dataset_management.postgres_manager import PostgresResourceManager
 import os
+from pygeoapi.dataset_management.postgres_manager \
+    import PostgresResourceManager
 
-prm = PostgresResourceManager()
+prm = PostgresResourceManager(None)
 
 shp_base_dir = "/tmp/test-shapefile"
 layer_name = "World_Countries_Generalized"

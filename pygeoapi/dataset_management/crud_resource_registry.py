@@ -1,4 +1,4 @@
-class CrudResourceRegistryInterface:
+class CrudResourceRegistry:
 
     def set_resource_config(self, collection_name, configuration):
         pass
