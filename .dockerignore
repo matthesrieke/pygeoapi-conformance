@@ -5,4 +5,5 @@ build
 dist
 docs
 pygeoapi.egg-info
-
+Dockerfile
+docker-compose.yml

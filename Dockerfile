@@ -100,7 +100,8 @@ ENV TZ=${TZ} \
     ${ADD_DEB_PACKAGES}"
 
 WORKDIR /pygeoapi
-ADD . /pygeoapi
+COPY ./requirements-docker.txt /pygeoapi/requirements-docker.txt
+COPY ./docker /pygeoapi/docker
 
 RUN mkdir temp
 
@@ -124,9 +125,6 @@ RUN \
     # Install remaining pygeoapi deps
     && pip3 install -r requirements-docker.txt \
 
-    # Install pygeoapi
-    && pip3 install -e . \
-
     # Set default config and entrypoint for Docker Image
     && cp /pygeoapi/docker/default.config.yml /pygeoapi/local.config.yml \
     && cp /pygeoapi/docker/entrypoint.sh /entrypoint.sh  \
@@ -137,11 +135,16 @@ RUN \
     && apt autoremove -y  \
     && rm -rf /var/lib/apt/lists/*
 
+ADD . /pygeoapi
+
+# Install pygeoapi
+RUN pip3 install -e .
+
 COPY portolan.geojson /pygeoapi/tests/data/portolan.geojson 
 COPY pygeoapi-config.yml pygeoapi-config.yml
 
 ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
-RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
+# RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
 ENV PYGEOAPI_OPENAPI=pygeoapi-openapi.yml
 
 #docker build -t pygeoapi-nextgensdi .    
