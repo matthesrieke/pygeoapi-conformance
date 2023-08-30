@@ -6,7 +6,50 @@ services:
     build: .
     ports:
       - "5000:5000"
+    volumes:
+      - ./pygeoapi:/pygeoapi/pygeoapi
+      - ./tests:/pygeoapi/tests
+      - ./pygeoapi-config.yml:/pygeoapi/pygeoapi-config.yml
+      - ./data:/data
     environment:
       - CONTAINER_PORT=5000
 
-      
+  postgis-1:
+    image: kartoza/postgis:14-3.1
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASS=postgres
+      - POSTGRES_DBNAME=gis
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+      - RUN_AS_ROOT=false
+      - REPLICATION=true
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASS=replicationSecret123
+      - PROMOTE_MASTER=true
+    volumes:
+      - postgis_1_data:/var/lib/postgresql
+  postgis-2:
+    image: kartoza/postgis:14-3.1
+    ports:
+      - 25432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASS=postgres
+      - POSTGRES_DBNAME=gis
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+      - RUN_AS_ROOT=false
+      - REPLICATION=true
+      - REPLICATION_USER=replicator
+      - REPLICATION_PASS=replicationSecret123
+      - REPLICATE_FROM=postgis-1
+    volumes:
+      - postgis_2_data:/var/lib/postgresql
+volumes:
+  postgis_1_data:
+    driver: local
+  postgis_2_data:
+    driver: local
