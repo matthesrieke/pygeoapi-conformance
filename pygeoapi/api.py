@@ -50,6 +50,10 @@ import logging
 import re
 from typing import Any, Tuple, Union, Optional
 import urllib.parse
+import os
+import tempfile
+import yaml
+from pathlib import Path
 
 from dateutil.parser import parse as dateparse
 from pygeofilter.parsers.ecql import parse as parse_ecql_text
@@ -97,6 +101,7 @@ from pygeoapi.dataset_management.postgres_manager \
 from pygeoapi.dataset_management.crud_resource_registry \
     import CrudResourceRegistry
 
+from pygeoapi.openapi import generate_openapi_document
 
 LOGGER = logging.getLogger(__name__)
 
@@ -4199,37 +4204,55 @@ class API(CrudResourceRegistry):
         headers['Content-Crs'] = f'<{content_crs_uri}>'
         
 
-    def get_resource_config(self, resource_name):
+    def get_resource_config(self, collection_name):
         """
         Returns the configuration of a given resource
         """
         
-        if resource_name in self.config['resources']:
-            return self.config['resources'][resource_name]
+        if collection_name in self.config['resources']:
+            return self.config['resources'][collection_name]
         else:
             return None
         
-    def set_resource_config(self, resource_name, config, force_update=False):
+    def set_resource_config(self, collection_name, config, force_update=False):
         """
         Sets or updates the configuration of a given resource.
         This allows the runtime addition and update of resources
         """
         
-        if resource_name in self.config['resources'] and not force_update:
-            raise Exception(f"Resource '{resource_name}' already configured")
+        if collection_name in self.config['resources'] and not force_update:
+            raise Exception(f"Resource '{collection_name}' already configured")
         
-        self.config['resources'][resource_name] = config
+        self.config['resources'][collection_name] = config
+        self.update_openapi_document()
         
-    def delete_resource_config(self, resource_name):
+    def delete_resource_config(self, collection_name):
         """
         Deletes the configuration of a given resource.
         Will remove the resorce from the runtime configuration but not
-        persist (-> restart will re-enable the resource from the config yaml)
+        persist (-> e.g. restart will re-enable the resource from the config yaml)
         """
         
-        if resource_name in self.config['resources']:
-            del self.config['resources'][resource_name]
+        if collection_name in self.config['resources']:
+            del self.config['resources'][collection_name]
         
+        self.update_openapi_document()
+        
+    def update_openapi_document(self):
+        """
+        Update the OpenAPI configuration so runtime changes are reflected.
+        """
+        tmp = tempfile.NamedTemporaryFile()
+        with open(tmp.name, 'w') as f, open(os.environ.get('PYGEOAPI_CONFIG'),
+                                            'r') as cf:
+            from_file_config = yaml.safe_load(cf)
+            from_file_config["resources"] = self.config["resources"]
+            yaml.safe_dump(from_file_config, f)
+            tmp.flush()
+            oai_content = generate_openapi_document(Path(tmp.name), 'yaml')
+            
+        with open(os.environ.get('PYGEOAPI_OPENAPI'), 'w') as f:
+            f.write(oai_content)
 
 
 def validate_bbox(value=None) -> list:
