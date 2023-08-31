@@ -2,7 +2,6 @@ services:
   app:
     image: pygeoapi-nextgensdi
     tty: true
-    command: pygeoapi serve
     build: .
     ports:
       - "5000:5000"
@@ -10,6 +9,7 @@ services:
       - ./pygeoapi:/pygeoapi/pygeoapi
       - ./tests:/pygeoapi/tests
       - ./pygeoapi-config.yml:/pygeoapi/pygeoapi-config.yml
+      - ./docker/entrypoint.sh:/entrypoint.sh
       - ./data:/data
     environment:
       - CONTAINER_PORT=5000

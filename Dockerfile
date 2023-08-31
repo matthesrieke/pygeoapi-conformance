@@ -144,8 +144,11 @@ COPY portolan.geojson /pygeoapi/tests/data/portolan.geojson
 COPY pygeoapi-config.yml pygeoapi-config.yml
 
 ENV PYGEOAPI_CONFIG=pygeoapi-config.yml
+
+# isn't this done in the entrypoint anyways?
 # RUN pygeoapi openapi generate pygeoapi-config.yml > pygeoapi-openapi.yml
 ENV PYGEOAPI_OPENAPI=pygeoapi-openapi.yml
 
 #docker build -t pygeoapi-nextgensdi .    
 #docker-compose up
+ENTRYPOINT /entrypoint.sh
